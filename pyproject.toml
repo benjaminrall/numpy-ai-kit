@@ -1,16 +1,14 @@
 [project]
-name = "python-ai"
-version = "0.1.0"
-description = "An artificial intelligence library built from scratch using pure Python and Numpy."
+name = "numpy-ai-kit"
+version = "0.1.2"
+description = "A complete artificial intelligence kit built from scratch using Numpy."
 readme = "README.md"
 authors = [
     { name = "Benjamin Rall", email = "benr2508@aol.com" }
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "numpy>=2.3.2",
-    "scikit-learn>=1.7.1",
-    "tensorflow>=2.20.0",
+    "numpy>=2.3.2"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -19,12 +17,12 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/benjaminrall/python-ai"
-Wiki = "https://github.com/benjaminrall/python-ai/wiki"
+Homepage = "https://github.com/benjaminrall/numpy-ai-kit"
+Wiki = "https://github.com/benjaminrall/numpy-ai-kit/wiki"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/pyai"]
+packages = ["src/numpyai"]
