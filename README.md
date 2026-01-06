@@ -1,7 +1,7 @@
-# Python AI
+# Numpy AI Kit
 
-PythonAI is an Artificial Intelligence library built from scratch using pure Python and Numpy.
+Numpy AI Kit is a complete artificial intelligence library built from scratch using pure Python and Numpy.
 
-The current documentation for the project can be accessed [here](https://github.com/benjaminrall/python-ai/wiki).
+The current documentation for the project can be accessed [here](https://github.com/benjaminrall/numpy-ai-kit/wiki).
 
 This README will be properly constructed when the project has a few more features to talk about.
