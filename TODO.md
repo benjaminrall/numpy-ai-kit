@@ -6,6 +6,7 @@
 - nn
   - LR schedulers
   - batch normalisation
+  - more datasets
 
 - feature_extraction
 
