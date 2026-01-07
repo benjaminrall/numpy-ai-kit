@@ -90,7 +90,7 @@ wheels = [
 
 [[package]]
 name = "numpy-ai-kit"
-version = "0.2.0"
+version = "0.1.3"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },

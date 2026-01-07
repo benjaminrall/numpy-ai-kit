@@ -1,4 +1,4 @@
-import numpyai
+import numpyai as npai
 from numpyai.backend import one_hot_encode
 from numpyai.nn.layers import Conv2D, MaxPooling2D, Flatten, Dropout, Dense
 from numpyai.nn.datasets import MNIST
@@ -19,7 +19,7 @@ y_train = one_hot_encode(y_train, num_classes)
 y_test = one_hot_encode(y_test, num_classes)
 
 # Creates the network
-network = numpyai.nn.Network([
+network = npai.nn.Network([
     Conv2D(32, (3, 3), activation='relu'),
     MaxPooling2D(),
     Conv2D(64, (3, 3), activation='relu'),
