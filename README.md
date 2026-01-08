@@ -1,6 +1,7 @@
 # Numpy AI
 
 [![PyPI Version](https://img.shields.io/pypi/v/numpy-ai-kit)](https://pypi.org/project/numpy-ai-kit/)
+[![GitHub Wiki](https://img.shields.io/badge/github-wiki-blue?logo=github)](https://github.com/benjaminrall/numpy-ai-kit/wiki)
 
 Numpy AI is a complete artificial intelligence library built from scratch using pure Python and Numpy. It aims to provide clear reference implementations of many algorithms for educational purposes.
 
