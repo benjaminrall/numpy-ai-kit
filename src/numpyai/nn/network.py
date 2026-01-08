@@ -4,7 +4,7 @@ from __future__ import annotations
 import pickle
 import numpy as np
 from collections import defaultdict
-from typing import Callable
+from typing import Callable, Optional
 from numpy.typing import NDArray
 from numpyai.backend import ProgressBar, Representable
 from .optimisers import Optimiser
@@ -13,7 +13,7 @@ from .layers import Layer, TrainableLayer
 from .metrics import Metric
 
 class Network(Representable):
-    """A neural network consisting of a linear stack of layers."""
+    """A sequential neural network model consisting of a linear stack of layers."""
 
     @property
     def built(self) -> bool:
@@ -25,7 +25,15 @@ class Network(Representable):
         """Whether the network has been compiled."""
         return self._compiled
 
-    def __init__(self, layers: list[Layer]) -> None:
+    def __init__(self, layers: list[Layer] = []) -> None:
+        """Constructs a new Network using the provided list of layers.
+
+        Parameters
+        ----------
+        layers : list[Layer], optional
+            List of layers to add to the network.
+            Defaults to an empty list.
+        """
         self.layers = layers
         self.optimiser = None
         self.loss = None
@@ -36,25 +44,25 @@ class Network(Representable):
         self._compiled = False
 
     def add(self, layer: Layer) -> None:
-        """Adds a layer to the neural network.
+        """Adds a layer instance on top of the network's layer stack.
 
         Parameters
         ----------
         layer : Layer
-            A layer instance to be added
+            Layer instance to be added to the network.
         """
         # Builds new layer if possible
         if self._built:
             self.output_shape = layer.build(self.output_shape)
         self.layers.append(layer)
 
-    def pop(self) -> Layer | None:
+    def pop(self) -> Optional[Layer]:
         """Removes and returns the last layer in the network.
 
         Returns
         -------
-        Layer | None
-            The removed layer, or None if the network was empty.
+        Optional[Layer]
+            The removed layer or None if the network was empty.
         """
         if len(self.layers) == 0:
             return None
@@ -62,8 +70,8 @@ class Network(Representable):
         self.output_shape = layer.input_shape
         return layer
     
-    def get_layer(self, index: int) -> Layer | None:
-        """Retrieves a layer based on its index
+    def get_layer(self, index: int) -> Optional[Layer]:
+        """Retrieves a layer from the network based on its index.
 
         Parameters
         ----------
@@ -72,7 +80,7 @@ class Network(Representable):
 
         Returns
         -------
-        Layer | None
+        Optional[Layer]
             The layer instance at the given index,
             or None if the index was out of range.
         """
@@ -113,12 +121,13 @@ class Network(Representable):
         Parameters
         ----------
         optimiser : str | Optimiser, optional
-            Name of an optimiser or an optimiser instance, by default 'rmsprop'
+            Name of an optimiser or an optimiser instance, by default 'rmsprop'.
         loss : str | Loss, optional
-            Name of a loss function or a loss function instance, by default 'categorical_crossentropy'
-        metrics : list, optional
+            Name of a loss function or a loss function instance, by default 'categorical_crossentropy'.
+        metrics : list[str | Metric | Callable], optional
             List of metric names, metric instances, or arbitrary metric functions to be used when
-            evaluating the network, by default []
+            evaluating the network, by default an empty list. Metric functions should be of the form: 
+            `(output: NDArray, target: NDArray) -> float`.
         """
         self.optimiser = Optimiser.get(optimiser)
         self.loss = Loss.get(loss)
@@ -131,54 +140,58 @@ class Network(Representable):
         Parameters
         ----------
         inputs : NDArray
-            An array of inputs with the shape (batches, ...)
+            Input data with shape (n_batches, *input_shape).
 
         Returns
         -------
         NDArray
-            The outputs of the network.
+            Outputs of the network with shape (n_batches, *output_shape).
         """
         return self.call(inputs, **kwargs)
     
     def call(self, inputs: NDArray, **kwargs) -> NDArray:
         """Calls the network on a given set of inputs.
 
+        Optionally, additional keyword arguments can be passed through to the `call` method
+        of all layers in the network. For example, the `training` argument (boolean)
+        is used to specify a different behaviour in training and inference in dropout layers.
+
         Parameters
         ----------
         inputs : NDArray
-            An array of inputs with the shape (batches, ...)
+            Input data with shape (n_batches, *input_shape).
 
         Returns
         -------
         NDArray
-            The outputs of the network.
+            Outputs of the network with shape (n_batches, *output_shape).
         """
         for layer in self.layers:
             inputs = layer(inputs, **kwargs)
         return inputs
     
     def fit(self, x: NDArray, y: NDArray, batch_size: int = 32, epochs: int = 1, verbose: bool = True,
-            validation_split: float = 0, validation_data: tuple[NDArray, NDArray] | None = None, shuffle: bool = True) -> None:
+            validation_split: float = 0, validation_data: Optional[tuple[NDArray, NDArray]] = None, shuffle: bool = True) -> None:
         """Trains the network for a fixed number of epochs
 
         Parameters
         ----------
         x : NDArray
-            Input data
+            Input data with shape (n_batches, *input_shape).
         y : NDArray
-            Target output data
-        batch_size : int, optional
-            Number of samples used per gradient update, by default 32
+            Target output data with shape (n_batches, *output_shape).
+        batch_size : int, optional.
+            Number of samples used per gradient update, by default 32.
         epochs : int, optional
-            Number of epochs to train the network, by default 1
+            Number of epochs to train the network, by default 1.
         verbose : bool, optional
-            Whether to train the network verbosely (with a progress bar), by default True
+            Whether to train the network verbosely (with a progress bar), by default True.
         validation_split : float, optional
-            Fraction of the training data to be used as validation data, by default 0
+            Fraction of the training data to be used as validation data, by default 0.
         validation_data : NDArray | None, optional
-            Validation data in the form (inputs, outputs), by default None
+            Validation data in the form (val_x, val_y), by default None.
         shuffle : bool, optional
-            Whether to shuffle the training data before each epoch, by default True
+            Whether to shuffle the training data before each epoch, by default True.
         """
         # Compiles the network with default settings if it hasn't been manually compiled
         if not self._compiled:
@@ -233,23 +246,28 @@ class Network(Representable):
 
 
     def evaluate(self, x: NDArray, y: NDArray, batch_size: int = 32, verbose: bool = True) -> dict[str, float]:
-        """Evaluates the performance of the network using its loss and all network metrics.
+        """Evaluates the performance of the network using its loss and metrics.
 
         Parameters
         ----------
         x : NDArray
-            Input data
+            Input data with shape (n_batches, *input_shape).
         y : NDArray
-            Target output data
+            Target output data with shape (n_batches, *output_shape).
         batch_size : int, optional
-            Number of samples used per computation batch, by default 32
+            Number of samples used per computation batch, by default 32.
         verbose : bool, optional
-            Whether to evaluate the network verbosely (with a progress bar), by default True
+            Whether to evaluate the network verbosely (with a progress bar), by default True.
 
         Returns
         -------
         dict[str, float]
             A dictionary mapping metric names to their evaluated values.
+
+        Raises
+        ------
+        RuntimeError
+            If the network has not yet been compiled.
         """
         # Ensures network is compiled before evaluating it
         if not self._compiled:
@@ -290,19 +308,22 @@ class Network(Representable):
     def predict(self, x: NDArray, batch_size: int = 32, verbose: bool = True) -> NDArray:
         """Generates output predictions for a set of inputs.
 
+        This method is designed for batched processing of large inputs. 
+        For small numbers of inputs, directly use `call` for faster execution.
+
         Parameters
         ----------
         x : NDArray
-            Input data
+            Input data with shape (n_batches, *input_shape).
         batch_size : int, optional
-            Number of samples used per computation batch, by default 32
+            Number of samples used per computation batch, by default 32.
         verbose : bool, optional
-            Whether to predict verbosely (with a progress bar), by default True
+            Whether to predict verbosely (with a progress bar), by default True.
 
         Returns
         -------
         NDArray
-            Array containing the network's predictions.
+            Outputs of the network with shape (n_batches, *output_shape).
         """
         # Creates an iterator for the batch indices
         batch_indices = range(0, x.shape[0], batch_size)
@@ -321,7 +342,7 @@ class Network(Representable):
         return y
     
     def penalty(self) -> float:
-        """Calculates the regularisation penalty of all layers in the network.
+        """Calculates the sum of the regularisation penalties of all layers in the network.
 
         Returns
         -------
@@ -331,12 +352,22 @@ class Network(Representable):
         return sum([layer.penalty() for layer in self.layers if isinstance(layer, TrainableLayer)])
     
     def summary(self) -> None:
-        """Prints a string summary of the network."""
+        """Prints a string summary of the network.
+        
+        The summary displays a table showing each layer's type, output shape, 
+        and trainable parameter number. It also displays the total number 
+        of trainable parameters in the network.
+
+        Raises
+        ------
+        RuntimeError
+            If the network has not yet been built.
+        """
         # Ensures that the network is built before printing a summary
         if not self._built:
-            raise ValueError(
+            raise RuntimeError(
                 "This model has not yet been built. Build the model first "
-                "by calling `build()` or by calling the model on a batch of data."
+                "by calling `build` or by calling the model on a batch of data."
             )
         
         # Stores all information to be printed in the summary
@@ -370,12 +401,13 @@ class Network(Representable):
         Parameters
         ----------
         filepath : str
-            Path to the location at which the network will be saved
+            Path to the location at which the network will be saved.
+            Must have the `.npai` extension.
         """
         # Ensures file is saved with the .npai extension
         if not filepath.endswith('.npai'):
             filepath += '.npai'
-
+        
         # Saves the network as a binary file
         with open(filepath, 'wb') as f:
             pickle.dump(self, f)
@@ -387,12 +419,18 @@ class Network(Representable):
         Parameters
         ----------
         filepath : str
-            Path to the saved network
+            Path to the saved network.
+            Must be a file with the `.npai` extension.
 
         Returns
         -------
         Network
             Network instance loaded from the file.
+
+        Raises
+        ------
+        OSError
+            If the file cannot be loaded correctly.
         """
         # Attempts to open the file and load the network
         try:
@@ -417,12 +455,17 @@ class Network(Representable):
         return [layer.get_variables() for layer in self.layers if isinstance(layer, TrainableLayer)]
     
     def set_variables(self, variables: list[list[NDArray]]) -> None:
-        """Sets the variables of the network, from a list of layer variables.
+        """Sets the variables of all layers in the network from a list.
 
         Parameters
         ----------
         variables : list[list[NDArray]]
-            A list containing the variables of each layer
+            A list containing the variables of each layer.
+
+        Raises
+        ------
+        ValueError
+            If the provided variables don't match the network's specification.
         """
         trainable_layers = [layer for layer in self.layers if isinstance(layer, TrainableLayer)]
         if len(variables) != len(trainable_layers):
@@ -436,7 +479,8 @@ class Network(Representable):
         Parameters
         ----------
         filepath : str
-            Path to the location at which the variables will be saved
+            Path to the location at which the variables will be saved.
+            Must have the `.npaiw` extension.
         """
         # Ensures file is saved with the .npaiw file extension
         if not filepath.endswith('.npaiw'):
@@ -452,7 +496,13 @@ class Network(Representable):
         Parameters
         ----------
         filepath : str
-            Path to the saved variables
+            Path to the saved variables.
+            Must be a file with the `.npaiw` extension.
+
+        Raises
+        ------
+        OSError
+            If the file cannot be loaded correctly.
         """
         # Attempts to open the file and load the variables
         try:

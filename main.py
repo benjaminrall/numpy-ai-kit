@@ -7,7 +7,7 @@ from numpyai.nn.datasets import MNIST
 num_classes = 10
 input_shape = (28, 28, 1)
 
-# Loads MNIST sample dataset from remote
+# Loads MNIST sample dataset 
 (x_train, y_train), (x_test, y_test) = MNIST.load_data()
 
 # Scale images to [0, 1] range

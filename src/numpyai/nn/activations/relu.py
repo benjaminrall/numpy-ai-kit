@@ -6,7 +6,7 @@ from numpyai.nn.backend import relu
 from .activation import Activation
 
 class ReLU(Activation):
-    """Rectified linear unit activation function."""
+    """Rectified linear unit activation function, `relu(x) = max(x, 0)`."""
 
     identifier = 'relu'
 

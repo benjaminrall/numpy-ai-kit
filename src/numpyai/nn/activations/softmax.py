@@ -10,6 +10,10 @@ class Softmax(Activation):
     Softmax activation function.
 
     Converts vectors of values to probability distributions.
+    The elements of the output vector are in the range [0, 1] and sum to 1. 
+
+    Each vector in the input is handled independently. The softmax of each 
+    vector x is computed as `softmax(x) = exp(x) / reduce_sum(exp(x))`.
     """
 
     identifier = 'softmax'

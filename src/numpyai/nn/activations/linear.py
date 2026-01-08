@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 from .activation import Activation
 
 class Linear(Activation):
-    """Linear activation function (pass-through)."""
+    """Linear (pass-through) activation function, `linear(x) = x`."""
 
     identifier = 'linear'
 

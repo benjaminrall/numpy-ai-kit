@@ -11,13 +11,13 @@ class Activation(Representable, Registrable['Activation'], ABC):
     """The activation function's string identifier."""
 
     def __call__(self, x: NDArray) -> NDArray:
-        """Applies the activation function to an input."""
+        """Applies the activation function to each element of `x`."""
         return self.call(x)
     
     @abstractmethod
     def call(self, x: NDArray) -> NDArray:
-        """Applies the activation function to an input."""
+        """Applies the activation function to each element of `x`."""
 
     @abstractmethod
     def derivative(self, x: NDArray) -> NDArray:
-        """Applies the derivative of the activation function to an input."""
+        """Applies the derivative of the activation function to each element of `x`."""

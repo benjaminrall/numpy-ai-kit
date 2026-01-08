@@ -6,11 +6,18 @@ from numpyai.nn.backend import leaky_relu
 from .activation import Activation
 
 class LeakyReLU(Activation):
-    """Rectified linear unit activation function."""
+    """Leaky rectified linear unit activation function, `leaky_relu(x) = max(x, alpha * x)`."""
 
     identifier = 'leaky_relu'
 
     def __init__(self, alpha: float = 0.3) -> None:
+        """Leaky rectified linear unit activation function, `leaky_relu(x) = max(x, alpha * x)`.
+
+        Parameters
+        ----------
+        alpha : float, optional
+            A float that controls the slope for values lower than 0. Defaults to 0.3.
+        """
         self.alpha = alpha
 
     def call(self, x: NDArray) -> NDArray:

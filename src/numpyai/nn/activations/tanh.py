@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 from .activation import Activation
 
 class Tanh(Activation):
-    """Hyperbolic tangent activation function."""
+    """Hyperbolic tangent activation function, `tanh(x)`."""
 
     identifier = 'tanh'
 
