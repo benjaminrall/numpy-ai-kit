@@ -10,10 +10,10 @@ class Initialiser(Representable, Registrable['Initialiser'], ABC):
     identifier: str
     """The initialiser's string identifier."""
 
-    def __call__(self, shape: tuple) -> NDArray:
-        """Returns a Numpy array of the given shape filled with values from the initialiser."""
+    def __call__(self, shape: tuple[int, ...]) -> NDArray:
+        """Returns an array of the given shape filled with values from the initialiser."""
         return self.call(shape)
     
     @abstractmethod
-    def call(self, shape: tuple) -> NDArray:
-        """Returns a Numpy array of the given shape filled with values from the initialiser."""
+    def call(self, shape: tuple[int, ...]) -> NDArray:
+        """Returns an array of the given shape filled with values from the initialiser."""

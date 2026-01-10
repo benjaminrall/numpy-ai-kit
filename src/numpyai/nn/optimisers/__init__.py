@@ -1,4 +1,4 @@
-"""PythonAI neural network optimisers."""
+"""Numpy AI neural network optimisers."""
 
 from .optimiser import Optimiser
 from .adadelta import Adadelta

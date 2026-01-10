@@ -20,3 +20,4 @@ class Representable:
 
         attrs_str = ', '.join([f'{key}={getattr(self, key)!r}' for key in attrs])
         return f'{self.__class__.__name__}({attrs_str})'
+    

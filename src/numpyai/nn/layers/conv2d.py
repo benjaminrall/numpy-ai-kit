@@ -7,10 +7,17 @@ from numpyai.nn.initialisers import Initialiser
 from numpyai.nn.regularisers import Regulariser
 from numpyai.nn.optimisers import Optimiser
 from numpyai.backend import dilate_2d
+from typing import Optional
 from .trainable_layer import TrainableLayer
 
 class Conv2D(TrainableLayer):
-    """A neural network layer that performs spatial convolution over 2D data."""
+    """
+    A layer that performs spatial convolution over 2D data. It implements the operation
+    `output = activation(conv2d(inputs, kernel) + bias)`.
+
+    This layer creates a set of kernels that are convolved with the layer input 
+    to produce its outputs.
+    """
 
     def __init__(self, filters: int,
                  kernel_size: tuple[int, int],
@@ -18,7 +25,7 @@ class Conv2D(TrainableLayer):
                  activation: str | Activation = 'linear',
                  kernel_initialiser: str | Initialiser = 'glorot_uniform',
                  bias_initialiser: str | Initialiser = 'zeros',
-                 kernel_regulariser: str | Regulariser | None = None
+                 kernel_regulariser: Optional[str | Regulariser] = None
                  ) -> None:
         super().__init__()
         self.filters = filters
@@ -52,24 +59,24 @@ class Conv2D(TrainableLayer):
         self._built = True
         return self.output_shape
     
-    def call(self, input: NDArray, **kwargs) -> NDArray:
+    def call(self, inputs: NDArray, **kwargs) -> NDArray:
         # Reshapes inputs that don't have channels to have a single channel
-        if len(input.shape) == 3:
-             input = np.reshape(input, input.shape[:3] + (1,))
+        if len(inputs.shape) == 3:
+             inputs = np.reshape(inputs, inputs.shape[:3] + (1,))
 
         # Builds the layer if it has not yet been built
         if not self._built:
-            self.build(input.shape[1:])
+            self.build(inputs.shape[1:])
 
         # Stores the current input tensor
-        self._input = input
+        self._input = inputs
 
         # Creates a view of the input containing the sub-matrices for convolution
-        s0, s1 = input.strides[1:3]
+        s0, s1 = inputs.strides[1:3]
         kernel_strides = (self.strides[0] * s0, self.strides[1] * s1, s0, s1)
         self.input_view = np.lib.stride_tricks.as_strided(
-            input, input.shape[:1] + self._view_shape,
-            input.strides[:1] + kernel_strides + input.strides[3:]
+            inputs, inputs.shape[:1] + self._view_shape,
+            inputs.strides[:1] + kernel_strides + inputs.strides[3:]
         )
 
         # Calculates the output of the convolution and applies the activation function to it

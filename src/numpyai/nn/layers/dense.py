@@ -6,21 +6,53 @@ from numpyai.nn.activations import Activation
 from numpyai.nn.initialisers import Initialiser
 from numpyai.nn.regularisers import Regulariser
 from numpyai.nn.optimisers import Optimiser
+from typing import Optional
 from .trainable_layer import TrainableLayer
 
 class Dense(TrainableLayer):
     """
-    Densely-connected neural network layer.
-    
-    `output = activation(dot(input, weights) + bias)`
+    A regular densely-connected neural network layer.
+
+    `Dense` implements the operation `output = activation(dot(input, weights) + bias)` 
+    where `activation` is the element-wise activation function passed as the `activation` 
+    argument, `weights` is a weights matrix created by the layer, and `bias` is a bias 
+    vector created by the layer.
+
+    If the input to the layer has a rank greater than 2, then `Dense` computes the dot 
+    product between the `inputs` and `weights` along the last axis of the `inputs` and 
+    axis 0 of the `weights`.
     """
 
     def __init__(self, units: int, 
                  activation: str | Activation = 'linear', 
                  weight_initialiser: str | Initialiser = 'glorot_uniform', 
                  bias_initialiser: str | Initialiser = 'zeros', 
-                 weight_regulariser: str | Regulariser | None = None
+                 weight_regulariser: Optional[str | Regulariser] = None
                  ) -> None:
+        """A regular densely-connected neural network layer.
+
+        `Dense` implements the operation `output = activation(dot(input, weights) + bias)` 
+        where `activation` is the element-wise activation function passed as the `activation` 
+        argument, `weights` is a weights matrix created by the layer, and `bias` is a bias 
+        vector created by the layer.
+
+        If the input to the layer has a rank greater than 2, then `Dense` computes the dot 
+        product between the `inputs` and `weights` along the last axis of the `inputs` and 
+        axis 0 of the `weights`.
+
+        Parameters
+        ----------
+        units : int
+            The number of units in the output.
+        activation : str | Activation, optional
+            _description_, by default 'linear'
+        weight_initialiser : str | Initialiser, optional
+            _description_, by default 'glorot_uniform'
+        bias_initialiser : str | Initialiser, optional
+            _description_, by default 'zeros'
+        weight_regulariser : Optional[str  |  Regulariser], optional
+            _description_, by default None
+        """
         super().__init__()
         self.units = units
         self._called = False
@@ -44,14 +76,14 @@ class Dense(TrainableLayer):
         self._built = True
         return self.output_shape
     
-    def call(self, input: NDArray, **kwargs) -> NDArray:
+    def call(self, inputs: NDArray, **kwargs) -> NDArray:
         # Builds the layer if it has not yet been built
         if not self._built:
-            self.build(input.shape[1:])
+            self.build(inputs.shape[1:])
 
         # Stores the input and calculates z output
-        self._input = input
-        self._z = np.dot(input, self._weights) + self._biases
+        self._input = inputs
+        self._z = np.dot(inputs, self._weights) + self._biases
         self._called = True
         return self.activation(self._z)
     

@@ -5,7 +5,7 @@ from numpy.typing import NDArray
 from .initialiser import Initialiser
 
 class Zeros(Initialiser):
-    """Initialiser that generates Numpy arrays filled with zeros."""
+    """Initialiser that generates arrays filled with zeros."""
 
     identifier = 'zeros'
 
@@ -14,7 +14,7 @@ class Zeros(Initialiser):
 
 
 class Ones(Initialiser):
-    """Initialiser that generates Numpy arrays filled with ones."""
+    """Initialiser that generates arrays filled with ones."""
 
     identifier = 'ones'
 
@@ -23,11 +23,18 @@ class Ones(Initialiser):
 
 
 class Constant(Initialiser):
-    """Initialiser that generates Numpy arrays filled with constant values."""
+    """Initialiser that generates arrays filled with a constant value."""
 
     identifier = 'constant'
 
     def __init__(self, value: float = 0) -> None:
+        """Initialiser that generates arrays filled with a constant value.
+
+        Parameters
+        ----------
+        value : float, optional
+            Constant value to be used for initialisation, by default 0.
+        """
         self.value = value
 
     def call(self, shape: tuple) -> NDArray:

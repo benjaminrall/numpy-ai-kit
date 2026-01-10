@@ -23,22 +23,25 @@ class Layer(Representable, ABC):
         return self._built
 
     def __init__(self) -> None:
-        self.input_shape: tuple[int, ...]
-        self.output_shape: tuple[int, ...]
+        self.input_shape: tuple[int, ...] = ()
+        self.output_shape: tuple[int, ...] = ()
         self._built: bool = False
 
     @abstractmethod
     def build(self, input_shape: tuple[int, ...]) -> tuple[int, ...]:
-        """Builds the layer for a given input shape, returning its output shape."""
+        """Builds the layer for a given input shape."""
     
-    def __call__(self, input: NDArray, **kwargs) -> NDArray:
+    def __call__(self, inputs: NDArray, **kwargs) -> NDArray:
         """Calculates the output of the layer for a given input."""
-        return self.call(input, **kwargs)
+        return self.call(inputs, **kwargs)
     
     @abstractmethod
-    def call(self, input: NDArray, **kwargs) -> NDArray:
+    def call(self, inputs: NDArray, **kwargs) -> NDArray:
         """Calculates the output of the layer for a given input."""
 
     @abstractmethod
     def backward(self, derivatives: NDArray, optimiser: Optimiser) -> NDArray:
-        """Performs a backwards pass through the layer and applies gradient updates if applicable."""
+        """
+        Performs a backwards pass through the layer, calculating gradients 
+        and applying updates to trainable variables via the optimiser.
+        """

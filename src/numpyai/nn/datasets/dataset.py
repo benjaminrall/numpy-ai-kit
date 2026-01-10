@@ -3,13 +3,13 @@
 from abc import ABC, abstractmethod
 from numpy.typing import NDArray
 from typing import Optional
-from numpyai.backend import Registrable
+from numpyai.backend import Representable, Registrable
 
-class Dataset(Registrable['Dataset'], ABC):
-    """Abstract base class from which all neural network metrics inherit."""
+class Dataset(Representable, Registrable['Dataset'], ABC):
+    """Abstract base class from which all neural network datasets inherit."""
 
     identifier: str
-    """The dataset's identifier."""
+    """The dataset's string identifier."""
 
     @staticmethod
     def load(dataset: str, path: Optional[str] = None) -> tuple[tuple[NDArray, NDArray], tuple[NDArray, NDArray]]:

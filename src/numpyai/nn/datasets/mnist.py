@@ -16,19 +16,19 @@ class MNIST(Dataset):
 
         This is a dataset of 60000 28x28 grayscale images of the 10 digits,
         along with a test set of 10000 images.
-        More info can be found at the 
+        More info can be found on the 
         [MNIST homepage](http://yann.lecun.com/exdb/mnist/).
         
         Parameters
         ----------
         path : str, optional
-            Path where to cache the dataset locally 
-            (relative to ~/.pyai/datasets), by default 'mnist.npz'
+            Path at which the dataset will be locally cached 
+            (relative to ~/.numpyai/datasets), by default `'mnist.npz'`
         
         Returns
         -------
         tuple[tuple[NDArray, NDArray], tuple[NDArray, NDArray]]
-            Tuple of NumPy arrays: `(x_train, y_train), (x_test, y_test)`.
+            Tuple of arrays: `(x_train, y_train), (x_test, y_test)`.
         
             **`x_train`**: `uint8` NumPy array of grayscale image data with shapes
             `(60000, 28, 28)`, containing the training data. Pixel values range

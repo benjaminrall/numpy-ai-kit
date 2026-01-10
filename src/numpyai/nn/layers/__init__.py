@@ -1,4 +1,4 @@
-"""PythonAI neural nework layers."""
+"""Numpy AI neural nework layers."""
 
 from .layer import Layer
 from .trainable_layer import TrainableLayer

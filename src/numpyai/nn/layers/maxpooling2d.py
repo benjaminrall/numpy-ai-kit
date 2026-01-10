@@ -3,12 +3,18 @@
 import numpy as np
 from numpy.typing import NDArray
 from numpyai.nn.optimisers import Optimiser
+from typing import Optional
 from .layer import Layer
 
 class MaxPooling2D(Layer):
-    """A neural network layer that performs the max pooling operation for 2D spatial data."""
+    """A layer that performs the max pooling operation for 2D spatial data. 
+    
+    It downsamples the input along its height and width by taking the maximum value 
+    over an input window (of size defined by `pool_size`) for each channel of the input. 
+    The window is shifted by `strides` along each dimension.
+    """
 
-    def __init__(self, pool_size: tuple[int, int] = (2, 2), strides: tuple[int, int] | None = None) -> None:
+    def __init__(self, pool_size: tuple[int, int] = (2, 2), strides: Optional[tuple[int, int]] = None) -> None:
         super().__init__()
         self.pool_size = pool_size
         self.strides = strides if strides else pool_size
@@ -28,19 +34,19 @@ class MaxPooling2D(Layer):
         self._built = True
         return self.output_shape
 
-    def call(self, input: NDArray, **kwargs) -> NDArray:
-                # Builds the layer if it has not yet been built.
+    def call(self, inputs: NDArray, **kwargs) -> NDArray:
+        # Builds the layer if it has not yet been built.
         if not self._built:
-            self.build(input.shape[1:])
+            self.build(inputs.shape[1:])
 
         # Calculates the strides to be used for creating the input view
-        s0, s1 = input.strides[1:3]
+        s0, s1 = inputs.strides[1:3]
         pool_strides = (self.strides[0] * s0, self.strides[1] * s1, s0, s1)
-        strides_shape = input.strides[:1] + pool_strides + input.strides[3:]
+        strides_shape = inputs.strides[:1] + pool_strides + inputs.strides[3:]
 
         # Creates a view containing the pools of the input
         pools = np.lib.stride_tricks.as_strided(
-            input, input.shape[:1] + self._view_shape, strides=strides_shape
+            inputs, inputs.shape[:1] + self._view_shape, strides=strides_shape
         )
 
         # Calculates the maxes and the max mask for the backwards pass

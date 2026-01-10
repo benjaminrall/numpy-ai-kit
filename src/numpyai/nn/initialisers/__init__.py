@@ -1,4 +1,4 @@
-"""PythonAI neural network initialisers."""
+"""Numpy AI neural network initialisers."""
 
 from .initialiser import Initialiser
 from .constant import Constant, Ones, Zeros

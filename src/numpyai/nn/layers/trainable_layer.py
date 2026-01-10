@@ -4,7 +4,10 @@ from numpy.typing import NDArray
 from .layer import Layer
 
 class TrainableLayer(Layer):
-    """Abstract base class from which all layers with trainable variables inherit."""
+    """Abstract base class from which all layers with trainable variables inherit.
+    
+    Inherits from the Layer base class.
+    """
 
     @property
     def trainable(self) -> bool:
@@ -25,13 +28,13 @@ class TrainableLayer(Layer):
         return 0
 
     def get_variables(self) -> list[NDArray]:
-        """Retrieves the variables of the layer as a list of Numpy arrays."""
+        """Retrieves the layer's variables as a list of arrays."""
         if not self._built:
             raise RuntimeError("Cannot retrieve variables from a layer that hasn't been built yet.")
         return self._variables.copy()
     
     def set_variables(self, variables: list[NDArray]) -> None:
-        """Sets the variables of the layer from a list of Numpy arrays."""
+        """Sets the layer's variables from a list of arrays."""
         if not self._built:
             raise RuntimeError("Cannot set variables for a layer that hasn't been built yet.")
         if len(variables) != self.n_variables or not all([a.shape == b.shape for a, b in zip(self._variables, variables)]):

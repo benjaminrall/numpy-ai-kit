@@ -6,7 +6,7 @@ from numpyai.nn.optimisers import Optimiser
 from .layer import Layer
 
 class Flatten(Layer):
-    """A neural network layer that flattens the input."""
+    """A layer that flattens the input without affecting the batch size."""
 
     def build(self, input_shape: tuple[int, ...]) -> tuple[int, ...]:
         self.input_shape = input_shape
@@ -14,11 +14,11 @@ class Flatten(Layer):
         self._built = True
         return self.output_shape
     
-    def call(self, input: NDArray, **kwargs) -> NDArray:
+    def call(self, inputs: NDArray, **kwargs) -> NDArray:
         # Builds the layer if it has not yet been built
         if not self._built:
-            self.build(input.shape[1:])
-        return input.reshape((input.shape[0], -1))
+            self.build(inputs.shape[1:])
+        return inputs.reshape((inputs.shape[0], -1))
     
     def backward(self, derivatives: NDArray, _: Optimiser) -> NDArray:
         if not self._built:

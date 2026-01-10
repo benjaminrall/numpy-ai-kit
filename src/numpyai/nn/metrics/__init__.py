@@ -1,4 +1,4 @@
-"""PythonAI neural network metrics."""
+"""Numpy AI neural network metrics."""
 
 from .metric import Metric
 from .accuracy import Accuracy
