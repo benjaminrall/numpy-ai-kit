@@ -6,7 +6,26 @@ from numpyai.nn.layers import TrainableLayer
 from .optimiser import Optimiser
 
 class SGD(Optimiser):
-    """Optimiser that implements the stochastic gradient descent algorithm with momentum."""
+    """
+    Optimiser that implements the stochastic gradient descent algorithm with momentum.
+
+    Update rule for parameter `w` with gradient `g` when `momentum` is 0:
+    ```
+    w = w - eta * g
+    ```
+
+    Update rule when `momentum` is larger than 0:
+    ```
+    velocity = momentum * velocity - eta * g
+    w = w + velocity
+    ```
+
+    When `nesterov=True`, this rule becomes:
+    ```
+    velocity = momentum * velocity - eta * g
+    w = w + momentum * velocity - eta * g
+    ```
+    """
 
     identifier = 'sgd'
     aliases = ['stochastic_gradient_descent', 'gradient_descent']
@@ -15,9 +34,9 @@ class SGD(Optimiser):
         self.eta = eta
         self.momentum = momentum
         self.nesterov = nesterov
-        self._velocities = defaultdict(Optimiser.zero_cache)
+        self._velocities = defaultdict(Optimiser._zero_cache)
 
-    def optimise_gradients(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
+    def call(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
         """Applies the SGD optimisation algorithm to the given gradients."""
         velocity = self._velocities[layer]
 

@@ -12,6 +12,14 @@ class BinaryCrossentropy(Metric):
     aliases = ['bce']
 
     def __init__(self, display_name: Optional[str] = None, from_logits: bool = False) -> None:
+        """Computes the binary cross-entropy between the outputs and targets.
+
+        Parameters
+        ----------
+        from_logits : bool, optional
+            Whether the predicted outputs are represented as 
+            logits or as probabilities.
+        """
         super().__init__(display_name)
         self.from_logits = from_logits
 

@@ -8,7 +8,12 @@ from numpyai.nn.layers import TrainableLayer
 from .optimiser import Optimiser
 
 class AdamW(Optimiser):
-    """Optimiser that implements the AdamW algorithm."""
+    """Optimiser that implements the AdamW algorithm.
+
+    AdamW optimisation is a stochastic gradient descent method that is 
+    based on adaptive estimation of first-order and second-order moments with 
+    an added method to decay weights.
+    """
 
     identifier = 'adamw'
 
@@ -21,11 +26,11 @@ class AdamW(Optimiser):
         self.bias_correction = bias_correction
         self._one_sub_beta_1 = 1 - beta_1
         self._one_sub_beta_2 = 1 - beta_2
-        self._ms = defaultdict(Optimiser.zero_cache)
-        self._vs = defaultdict(Optimiser.zero_cache)
-        self._iterations = Optimiser.zero_cache()
+        self._ms = defaultdict(Optimiser._zero_cache)
+        self._vs = defaultdict(Optimiser._zero_cache)
+        self._iterations = Optimiser._zero_cache()
 
-    def optimise_gradients(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
+    def call(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
         """Applies the AdamW optimisation algorithm to the given gradients."""
         iteration = self._iterations[layer] = self._iterations[layer] + 1
         m = self._ms[layer]

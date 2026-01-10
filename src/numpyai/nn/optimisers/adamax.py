@@ -8,7 +8,14 @@ from numpyai.nn.layers import TrainableLayer
 from .optimiser import Optimiser
 
 class Adamax(Optimiser):
-    """Optimiser that implements the Adamax algorithm."""
+    """Optimiser that implements the Adamax algorithm.
+
+    Adamax, a variant of Adam based on the infinity norm, is a first-order 
+    gradient-based optimisation method. Due to its capabilitiy of adjusting 
+    the learning rate based on data characteristics, it is suited to learn 
+    time-variant process, e.g. speech data with dynamically changed noise 
+    conditions.
+    """
 
     identifier = 'adamax'
 
@@ -17,11 +24,11 @@ class Adamax(Optimiser):
         self.beta_1 = beta_1
         self.beta_2 = beta_2
         self._one_sub_beta_1 = 1 - beta_1
-        self._ms = defaultdict(Optimiser.zero_cache)
-        self._us = defaultdict(Optimiser.zero_cache)
-        self._iterations = Optimiser.zero_cache()
+        self._ms = defaultdict(Optimiser._zero_cache)
+        self._us = defaultdict(Optimiser._zero_cache)
+        self._iterations = Optimiser._zero_cache()
 
-    def optimise_gradients(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
+    def call(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
         """Applies the Adamax optimisation algorithm to the given gradients."""
         iteration = self._iterations[layer] = self._iterations[layer] + 1
         m = self._ms[layer]

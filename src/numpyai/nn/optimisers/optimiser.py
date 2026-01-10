@@ -17,19 +17,19 @@ class Optimiser(Representable, Registrable['Optimiser'], ABC):
     """The optimiser's string identifier."""
 
     def __call__(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
-        """Applies the optimisation algorithm to the given gradients."""
-        return self.optimise_gradients(layer, gradients)
+        """Optimises the given gradients to be applied to the given layer."""
+        return self.call(layer, gradients)
     
     @staticmethod
-    def zero() -> Literal[0]:
+    def _zero() -> Literal[0]:
         """Returns 0 for defaultd dictionary initialisation."""
         return 0
 
     @staticmethod
-    def zero_cache() -> defaultdict[Any, Union[float, NDArray]]:
+    def _zero_cache() -> defaultdict[Any, Union[float, NDArray]]:
         """Returns a dictionary that defaults to zeros for optimiser caches."""
-        return defaultdict(Optimiser.zero)
+        return defaultdict(Optimiser._zero)
 
     @abstractmethod
-    def optimise_gradients(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
-        """Applies an optimisation algorithm to the given gradients."""
+    def call(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
+        """Optimises the given gradients to be applied to the given layer."""

@@ -8,7 +8,13 @@ from numpyai.nn.layers import TrainableLayer
 from .optimiser import Optimiser
 
 class RMSprop(Optimiser):
-    """Optimiser that implements the RMSprop algorithm."""
+    """
+    Optimiser that implements the RMSprop algorithm.
+
+    RMSprop maintains a moving (discounted) average of the squares of gradients, 
+    and divides the gradient by the root of this average. This implementation of 
+    RMSprop uses plain momentum and not Nesterov momentum.
+    """
 
     identifier = 'rmsprop'
 
@@ -16,9 +22,9 @@ class RMSprop(Optimiser):
         self.eta = eta
         self.rho = rho
         self._one_sub_rho = 1 - rho
-        self._averages = defaultdict(Optimiser.zero_cache)
+        self._averages = defaultdict(Optimiser._zero_cache)
 
-    def optimise_gradients(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
+    def call(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
         """Applies the RMSprop optimisation algorithm to the given gradients."""
         average = self._averages[layer]
 

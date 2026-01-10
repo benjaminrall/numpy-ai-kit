@@ -9,7 +9,12 @@ from numpyai.nn.layers import TrainableLayer
 from .optimiser import Optimiser
 
 class Adagrad(Optimiser):
-    """Optimiser that implements the Adagrad algorithm."""
+    """Optimiser that implements the Adagrad algorithm.
+
+    Adagrad is an optimiser with parameter-specific learning rates, which 
+    are adapted relative to how frequently a parameter gets updated during 
+    training. The more updates a parameter receives, the smaller the updates.
+    """
 
     identifier = 'adagrad'
 
@@ -26,7 +31,7 @@ class Adagrad(Optimiser):
         """Returns a default dictionary for accumulator caches."""
         return defaultdict(self.get_initial_accumulator_value)
 
-    def optimise_gradients(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
+    def call(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
         """Applies the Adagrad optimisation algorithm to the given gradients."""
         accumulator = self._accumulators[layer]
 

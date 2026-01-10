@@ -8,7 +8,18 @@ from numpyai.nn.layers import TrainableLayer
 from .optimiser import Optimiser
 
 class Adadelta(Optimiser):
-    """Optimiser that implements the Adadelta algorithm."""
+    """Optimiser that implements the Adadelta algorithm.
+
+    Adadelta optimisation is a stochastic gradient descent method that is 
+    based on adaptive learning rate per dimension to address two drawbacks:
+    - The continual decay of learning rates throughout training.
+    - The need for a manually selected global learning rate.
+
+    Adadelta is a more robust extension of Adagrad that adapts learning rates
+    based on a moving windows of gradient updates, instead of accumulating all 
+    past gradients. This way, Adadelta continues learning even when many updates 
+    have been done.
+    """
 
     identifier = 'adadelta'
 
@@ -16,10 +27,10 @@ class Adadelta(Optimiser):
         self.eta = eta
         self.rho = rho
         self._one_sub_rho = 1 - rho
-        self._grad_avgs = defaultdict(Optimiser.zero_cache)
-        self._delta_avgs = defaultdict(Optimiser.zero_cache)
+        self._grad_avgs = defaultdict(Optimiser._zero_cache)
+        self._delta_avgs = defaultdict(Optimiser._zero_cache)
 
-    def optimise_gradients(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
+    def call(self, layer: TrainableLayer, gradients: list[NDArray]) -> list[NDArray]:
         """Applies the Adadelta optimisation algorithm to the given gradients."""
         grad_avg = self._grad_avgs[layer]
         delta_avg = self._delta_avgs[layer]
